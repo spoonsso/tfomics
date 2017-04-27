@@ -25,7 +25,7 @@ class NeuralNet:
 	def __init__(self, network, placeholders):
 		self.network = network
 		self.placeholders = placeholders
-		self.saver = tf.train.Saver()
+		self.saver = tf.train.Saver(max_to_keep=None)
 
 
 	def inspect_layers(self):
