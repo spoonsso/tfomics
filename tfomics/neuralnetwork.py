@@ -4,6 +4,7 @@ import tensorflow as tf
 import numpy as np
 from .optimize import build_loss, build_updates
 from .metrics import calculate_metrics
+from six.moves import cPickle
 #from .utils import *
 
 
@@ -25,7 +26,7 @@ class NeuralNet:
 	def __init__(self, network, placeholders):
 		self.network = network
 		self.placeholders = placeholders
-		self.saver = tf.train.Saver(max_to_keep=None)
+		self.saver = tf.train.Saver()#max_to_keep=None)
 
 
 	def inspect_layers(self):
@@ -177,9 +178,12 @@ class NeuralTrainer():
 			value += self.train_metric(results[2], feed_dict[self.targets])
 			performance.add_loss(results[1])
 			performance.progress_bar(i+1., num_batches, value/(i+1))
+
 		if verbose > 1:
 			print(" ")
 
+		# print("total time: {}".format((time.time()-performance.start_time)))
+		# print("num batches: {}".format(num_batches))
 		# calculate mean loss and store
 		loss = performance.get_mean_loss()
 		self.add_loss(loss, 'train')
@@ -256,6 +260,8 @@ class NeuralTrainer():
 		"""save model parameters to file, according to filepath"""
 
 		min_loss, min_epoch, epoch = self.valid_monitor.get_min_loss()
+
+
 		if self.save == 'best':
 			if self.valid_monitor.loss[-1] <= min_loss:
 				print('  lower cross-validation found')
@@ -398,6 +404,7 @@ class MonitorPerformance():
 				print("  " + name + " accuracy:\t{:.5f}+/-{:.5f}".format(mean_vals[0], error_vals[0]))
 				print("  " + name + " auc-roc:\t{:.5f}+/-{:.5f}".format(mean_vals[1], error_vals[1]))
 				print("  " + name + " auc-pr:\t\t{:.5f}+/-{:.5f}".format(mean_vals[2], error_vals[2]))
+
 			elif (self.objective == 'squared_error'):
 				print("  " + name + " Pearson's R:\t{:.5f}+/-{:.5f}".format(mean_vals[0], error_vals[0]))
 				print("  " + name + " rsquare:\t{:.5f}+/-{:.5f}".format(mean_vals[1], error_vals[1]))

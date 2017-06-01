@@ -35,6 +35,12 @@ def train_minibatch(nntrainer, data, batch_size=128, num_epochs=500,
 												batch_size=batch_size,
 												verbose=verbose)
 
+			train_loss = nntrainer.test_model(data['train'], 
+									name="train", 
+									batch_size=batch_size,
+									verbose=verbose)
+
+
 			# save model
 			nntrainer.save_model()
 
